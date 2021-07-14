@@ -205,4 +205,76 @@ WHERE first_name ILIKE '%er%' OR last_name ILIKE '%er%'
 GROUP BY allows us to aggregate data and see how data is distributed by category
 HAVING - filtering with a GROUP BY
 
+Main purpose is for single output from multiple inputs.\
+Many aggregate functions, MAX, MIN, SUM, AVG, COUNT
+- happy only in SELECT or HAVING clause.
+- AVG returns a floating point with many decimals but then you can use ROUND to specify precision.
+
+Aggregate functions are functions so you need parenthesis.\
+Some examples:
+
+```sql
+SELECT MIN(replacement_cost) FROM film;
+```
+
+Below doesn't work because `MIN(replacement_cost)` only returns 1 value and so what film_id would you even associate with that? You need to use GROUP_BY. 
+```sql
+SELECT MIN(replacement_cost), film_id FROM film;
+```
+
+
+You can do:
+```sql
+SELECT MIN(replacement_cost), MAX(film_id) FROM film;
+```
+
+For avg and rounding:
+
+```sql
+SELECT ROUND(AVG(replacement_cost), 2) FROM film;
+```
+
+
+#### GROUP BY
+- aggregate columns by some category
+First you need to choose a categorical column to run the GROUP BY on. COULD be numbers, but are non-continuous but are still categories. Categorical columns could still be numeric like class levels on a ship or something.
+  
+Remember, aggregate function takes multiple values and reduces it to 1. GROUP by splits it up and then each section is run into the aggregate function.
+
+![group_by](images/group_by.png)
+
+syntax:
+```sql
+SELECT category_col, AGG(data_col)
+FROM table
+GROUP BY category_col
+```
+
+GROUP By must appear after FROM or where.
+
+In the SELECT statement, columns must either have an aggregate statement function OR be in the GROUP BY call. If thecolumn is just being selected, it just be in the GROUP BY statement.
+
+Can have multiple GROUP BY:
+
+```sql
+SELECT company, division, SUM(sales)
+FROM finance_table
+GROUP BY company, division
+```
+the above is number of sales per company per division.
+
+**WHERE statements do not refer to the aggregation result, that should be what the HAVING statement is for. HAVING is for filtering GROUP BY aggregations** The WHERE Filtering happens before the GROUP BY statement.
+
+IF you want to sort using ORDER, reference the entire function:
+
+```sql
+SELECT company, SUM(sales)
+FROM finance_table
+GROUP BY company
+ORDER BY SUM(sales)
+LIMIT 5
+```
+
+If you want to sort results based on the aggregate, reference the entire function.
+
 
