@@ -277,4 +277,69 @@ LIMIT 5
 
 If you want to sort results based on the aggregate, reference the entire function.
 
+Find customers who spent the most in order:
+```sql
+SELECT customer_id, SUM(amount) FROM payment
+GROUP BY customer_id
+ORDER BY SUM(amount) DESC
+```
 
+How much each customer spent with each staff member:
+
+```sql
+SELECT customer_id, staff_id, SUM(amount) FROM payment
+GROUP BY customer_id, staff_id
+ORDER BY customer_id
+```
+
+
+days with least amount transcations in terms of $$$:
+```sql
+SELECT DATE(payment_date), SUM(amount) FROM payment
+GROUP BY DATE(payment_date)
+ORDER BY SUM(amount) DESC
+```
+
+avg replcement cost of movies by film rating:
+```sql
+SELECT rating,
+ROUND(AVG(replacement_cost), 2)
+FROM film
+GROUP BY rating
+```
+
+top 5 customers payments to award coupons to later:
+```sql
+SELECT customer_id, SUM(amount)
+FROM payment
+GROUP BY customer_id
+ORDER BY SUM(amount) DESC
+LIMIT 5
+```
+
+#### HAVING clause
+
+What if we wanted to filter based on the `SUM(sales)` here? WHERE cannot do that. We need HAVING
+
+![having.png](images/having.png)
+
+Using WHERE, the sum(sales) doesn't happen until after the GROUP BY and WHERE and GOOGLE will be left out here.
+
+We can write `HAVING SUM(sales) > 1000`
+
+To find companies with sales > 1000 properly:
+
+![having2.png](images/having2.png)
+
+```sql
+SELECT customer_id, SUM(amount) FROM payment
+GROUP BY customer_id
+HAVING SUM(amount) > 100
+```
+
+Number of customers per store:
+```sql
+SELECT store_id, COUNT(customer_id) FROM customer
+GROUP BY store_id
+HAVING COUNT(customer_id) > 300
+```
