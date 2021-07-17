@@ -343,3 +343,39 @@ SELECT store_id, COUNT(customer_id) FROM customer
 GROUP BY store_id
 HAVING COUNT(customer_id) > 300
 ```
+
+
+## JOINS
+
+- AS clause or aliasing
+- discussing FULL joins, INNER joins, OUTER joins, UNIONS
+- once you understand one join, you'll get the others quickly!
+
+#### AS clause
+
+Aliases can clarify:
+
+```sql
+SELECT SUM(amount) as net_revenue
+FROM payment;
+```
+
+**AS gets executed at end of query so you cannot use it in a WHERE. Cannot use the alias in a WHERE or GROUP BY segment. You can only use it in the SELECT**
+
+You can do this:
+
+```sql
+SELECT customer_id, SUM(amount) AS total_spent
+FROM payment
+GROUP BY customer_id
+HAVING SUM(AMOUNT) > 100
+```
+
+cannot do this:
+
+```sql
+SELECT customer_id, SUM(amount) AS total_spent
+FROM payment
+GROUP BY customer_id
+HAVING total_spent > 100
+```
