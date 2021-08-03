@@ -379,3 +379,247 @@ FROM payment
 GROUP BY customer_id
 HAVING total_spent > 100
 ```
+
+
+#### INNER JOIN
+
+Why do JOINS?
+- allows us to combine multiple tables together
+- WHY different JOINS? deal with data present only in one of the joined tables.
+
+INNNER JOIN will result with the set of records that match in both tables.
+
+![inner_join](images/inner_join.png)
+
+INNER JOIN is the only join that is symmetrical, meaning you can switch the table you SELECT from and JOIN from and to and it'll be the same.
+
+```sql
+SELECT payment_id, payment.customer_id, first_name
+FROM customer
+INNER JOIN payment
+ON payment.customer_id = customer.customer_id
+```
+
+is the same as:
+
+```sql
+SELECT payment_id, payment.customer_id, first_name
+FROM payment
+INNER JOIN customer
+ON payment.customer_id = customer.customer_id
+```
+
+![inner_join_diagram](images/inner_join_diagram.png)
+
+This example gives you back all the columns in an INNER JOIN:
+
+![inner_join_example](images/inner_join_example.png)
+
+If you want to filter out columns and there is a duplicate column name, you have to specify the table. If you want to SELECT a column that only appears in one of the tables, you don't need to specify the table name prior to the column name in the SELECT.
+
+![inner_join_example_select_columns](images/inner_join_example_select_columns.png)
+
+JOIN without the INNER; postgresql will treat it as an INNER JOIN.
+
+#### OUTER JOins
+- allows us to specify how to deal with values only being presnet in one of the tables being joined vs INNER JOIN which only gets rows with values in both tables.
+
+FULL OUTER JOIN:
+- also symmetrical: table order doesn't matter since we're grabbing eveerything.
+
+To get opposite of INNER JOIN, you need to use WHERE with FULL OUTER JOIN, to get rows unique to each table in otherwise rows that are not found in both tables:
+
+![full_outer_join_where](images/full_outer_join_where.png)
+
+Another example: make sure we don't have payment info attached to a customer, or customer info not attached to payments. Let's see if we have any rows:
+
+```sql
+SELECT * FROM customer
+FULL OUTER JOIN payment
+ON customer.customer_id = payment.customer_id
+WHERE customer.customer_id IS NULL
+OR payment.customer_id IS NULL
+```
+
+That's how you would do it. That takes all the records at first using FULL OUTER JOIN then filters using WHERE
+
+#### LEFT OUTER JOIN
+- results in set of records that are in the left table, if there is no match with the right table, the results are null
+
+- the SELECT and LEFT OUTER JOIN table matter since not symmetrical in the venn diagram. Order matters.
+
+- below all rows are in TABLE A but we don't return anything exclusvie to table B in:
+
+```sql
+SELECT * FROM TABLE A
+LEFT OUTER JOIN TABLE B
+ON TABLEA.col_match = TABLEB.col_match
+```
+
+![left_outer_join](images/left_outer_join.png)
+
+notice things that were exclusive to table B we don't see in the left outer join. so we can see that table order matters.
+
+To get the venn diagram where only the left part of the left circle is shaded, use WHERE.
+
+![left_outer_join1](images/left_outer_join1.png)
+
+rows exclusive to table A:
+
+![left_outer_join2](images/left_outer_join2.png)
+
+LEFT JOIN = LEFT OUTER JOIN in sql. same thing syntacically.
+
+IN this query:
+```sql
+SELECT film.film_id, title, inventory_id, store_id
+FROM film
+LEFT JOIN inventory ON
+inventory.film_id = film.film_id
+```
+
+all rows from film will appear because film is on left side. You'll only see rows from film or in both film or inventory, but not in inventory and not film. Some of the rows returned will have NULL for inventory_id
+
+#### RIGHT JOIN
+- same thing as a LEFT JOIN but the tables reversed. You could just switch order of tables in a LEFT JOIN and it's = RIGHT JOIN
+- return back rows exclusively in table B (The right join table) or both table B and table A. Do not return back rows from table A (the non right join table).
+
+- use a where tableA.id IS NULL to only return back rows exclusively in table B.
+
+![right_join](images/right_join.png)
+
+#### UNION operator
+- used to combine results of 2 or more SELECT statements. serves to concatenate 2 results together.
+
+ex:
+```sql
+SELECT column_name(s) FROM table1
+UNION
+SELECT column_name(s) FROM table2
+```
+
+should be able to stack results on top of each other. The rows should be pastable on top of each other so same columns.
+
+
+#### Example of a Multiple JOin query:
+
+```sql
+SELECT title, first_name, last_name FROM actor as act
+    INNER JOIN film_actor as factor ON
+        factor.actor_id = act.actor_id
+    INNER JOIN film as f ON
+        f.film_id = factor.film_id
+WHERE first_name = 'Nick' AND last_name = 'Wahlberg'
+```
+
+We needed to join 3 tables here in the above query. Find distinct titles of Nick Wahlberg films.
+
+vid here: https://www.udemy.com/course/the-complete-sql-bootcamp/learn/lecture/18997814#overview
+
+
+## Advanced Topics Section 6
+Topics are:
+- timestamps and extract
+- math functions
+- string functions
+- sub-query
+- self-joins
+
+Postgresql can hold:
+TIME - contains only time (hours minutes and seconds)
+DATE - contains only date (only date month day and year)
+TIMESTAMP - contains date and time (both)
+TIMESTAMPZ - containts date, time, and timezone
+
+you may not need TIMESTAMPZ. For keeping track of worker hours, you just need the time they clocked in and the time they clocked out... so only TIME.
+
+```sql
+SHOW TIMEZONE
+```
+The above shows the timezone we're working in.
+
+```sql
+SELECT NOW()
+```
+gets timestamp in timestamp data format:
+
+![now_function](images/now_function.png)
+
+
+```sql
+SELECT TIMEOFDAY()
+```
+![timeofday](images/timeofday.png)
+
+this is a string, not a timestamp
+
+
+The below gets your just the date, not a function call:
+```sql
+SELECT CURRENT_DATE
+```
+
+
+#### EXTRACT function
+
+- allows you to get a subcomponent of a date value: like the year, month, day, quarter, week
+
+If you have a full timestamp, and you just want a year, you can get just the year
+
+```sql
+EXTRACT(YEAR from date_col)
+```
+
+example:
+
+```sql
+SELECT EXTRACT(YEAR FROM payment_date) myyear
+FROM payment
+```
+
+results:
+
+![extract](images/extract.png)
+
+
+#### AGE
+
+calculates current age of a timestamp in relation to current date
+```sql
+AGE(date_col)
+```
+
+takes current date and calculate how old timestamp in database is. If today is 2020, and column is 2000, returns 20 years.
+
+example:
+
+```sql
+SELECT AGE(payment_date) as myyear
+FROM payment;
+```
+
+
+results:
+![age](images/age_func.png)
+
+
+combine:
+![age_extract_func](images/age_extract_func.png)
+
+#### to_char
+- general function to convert date types to text
+
+```sql
+TO_CHAR(date_col, `mm-dd-yyyy`)
+```
+
+```sql
+SELECT TO_CHAR(payment_date, 'dd/mm-YYYY')
+FROM payment;
+```
+
+the last argument is the text formatting which you can use dashes or slashes to format:
+
+example:
+
+![to_char_date](images/to_char_date.png)
