@@ -606,6 +606,14 @@ results:
 combine:
 ![age_extract_func](images/age_extract_func.png)
 
+To find number of payments on a monday:
+
+```sql
+SELECT COUNT(*)
+FROM payment
+WHERE EXTRACT(dow from payment_date) = 1;
+```
+
 #### to_char
 - general function to convert date types to text
 
@@ -623,3 +631,139 @@ the last argument is the text formatting which you can use dashes or slashes to 
 example:
 
 ![to_char_date](images/to_char_date.png)
+
+
+#### Mathematical Operators
+- you can apply operators to one or more columns
+- everything is available to you in postgresql, even bitwise
+
+even functions: abs(), log(), round(), power() and trig functions and random() for complex sql queries.
+
+examples:
+
+```sql
+SELECT ROUND(rental_rate/replacement_cost, 4) * 100 AS percent_cost 
+FROM film
+```
+The above is percentage cost of rental rate of replacement cost
+![percent_cost](images/percent_cost.png)
+
+
+#### String Functions
+- you can also do string functions
+
+functions that you can run:
+- string concatenation
+- substring and searching YOu can extract substring from
+- lower case
+- position index
+- length of string
+etc
+
+examples:
+```sql
+SELECT LENGTH(first_name) FROM customer
+```
+
+```sql
+SELECT first_name || ' ' || last_name FROM customer AS full_name
+```
+the above adds a space in between first and last name
+
+
+first letter and non-capitalized last name in an email:
+
+```sql
+SELECT LEFT(first_name, 1) || LOWER(last_name) || '@gmail.com' FROM customer AS full_name
+```
+
+
+#### Subqueries
+Let's look at subqueries that return a value, subqueries using EXISTS
+
+How to find students who did better than avg grade:
+
+First part, find the avg grade:
+```sql
+SELECT AVG(grade) from test_scores
+```
+
+second part is something like this which finds the student and grade from a table:
+
+```sql
+SELECT student, grade
+FROM test_scores
+```
+
+then find students above the avg:
+```sql
+SELECT student, grade
+FROM test_scores
+WHERE grade > (SELECT AVG(grade) 
+FROM test_scores)
+```
+
+subquery gets run first inside the parenthesis and returns a value so that the query is like:
+
+```sql
+SELECT student, grade
+FROM test_scores
+WHERE grade > 70
+```
+
+previously you would have to run 1 query and use the reuslt in another in two steps. This allows us to do it in one step.
+
+Using IN in subquery:
+Instead of join, you can use IN to see if student is in a list
+
+```sql
+SELECT student, grade
+FROM test_scores
+where student IN
+(SELECT student
+    FROM honor_roll_table)
+```
+
+the above is easy to reason above, more so than a join.
+
+
+More examples:
+films where the rental rate is greater than avg:
+```sql
+SELECT title, rental_rate
+FROM film
+WHERE rental_rate > 
+(SELECT AVG(rental_rate) FROM film)
+```
+
+subquery returns multiple results so use the IN operator. This query gives back film titles where the film_id is in the subquery list. We needed to do this because the film_id isn't in the rental table. Inventory does have the film_id and the rental_table does have an inventory_id so we can join inventory and rental tables using `inventory_id`. Below, the sub_query gives back a list of film_ids which you can then use to select films and titles from another table (the film table)
+
+![subquery_join2](images/subquery_join2.png)
+
+![subquery_join1](images/subquery_join1.png)
+
+
+The following returns customers who made payment over $11 using EXISTS in the subquery:
+```sql
+SELECT first_name, last_name
+FROM customer AS c
+WHERE EXISTS(
+    SELECT * FROM payment as p
+    WHERE p.customer_id = c.customer_id
+    AND amount > 11
+)
+```
+
+the subquery checks if the payment > 11 exists for the customer and if so, the main query will return the first and last_name
+
+NOT also works with EXISTS:
+
+```sql
+SELECT first_name, last_name
+FROM customer AS c
+WHERE NOT EXISTS(
+    SELECT * FROM payment as p
+    WHERE p.customer_id = c.customer_id
+    AND amount > 11
+)
+```
