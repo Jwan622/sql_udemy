@@ -767,3 +767,35 @@ WHERE NOT EXISTS(
     AND amount > 11
 )
 ```
+
+
+#### Self-Join
+- a query in which a table is joined to itself.
+- Self-joins are useful for comparing values in a column of rows within the same table.
+- same table in both parts of the JOIN
+- you need an alias otherwise table names would be ambiguous
+
+example:
+```sql
+SELECT tableA.col, tableB.col
+FROM table as tableA
+JOIN table as tableB ON
+tableA.some_col = tableB.other_col
+```
+notice the aliases are used in the JOIN part where the = sign is used.
+
+
+This is when to use a self join:
+![self_join_when_to_use](images/self_join_when_to_use.png)
+
+
+To find movies with the same runtime (same table!):
+```sql
+SELECT f1.title, f2.title, f1.length
+FROM film as f1
+INNER JOIN film as f2 ON 
+f1.film_id != f2.film_id
+AND f1.length = f2.length
+```
+
+notice the != in the first ON clause of the INNER JOIN because we want to see films with the same length as other films, not itself.
