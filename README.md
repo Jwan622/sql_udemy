@@ -799,3 +799,139 @@ AND f1.length = f2.length
 ```
 
 notice the != in the first ON clause of the INNER JOIN because we want to see films with the same length as other films, not itself.
+
+
+## Assessment 2
+Question 1:
+```sql
+SELECT * from cd.facilities
+```
+
+Question 2:
+```sql
+SELECT name, membercost from cd.facilities
+```
+
+
+Question 3:
+```sql
+SELECT name, membercost from cd.facilities
+WHERE membercost > 0
+```
+
+
+Question 4:
+```sql
+SELECT facid, name, membercost, monthlymaintenance from cd.facilities
+WHERE membercost < (facilities.monthlymaintenance/50)
+AND membercost > 0;
+```
+
+
+Question 5:
+Remember about LIKE
+Two of the important selectors in pattern matching with LIKE/ILIKE are the percentage sign(%) and underscore(_).
+
+% sign in a pattern matches any sequence of zero or more characters.
+_ in a pattern matches any single character.
+
+For instance, consider the following query:
+
+```sql
+SELECT string FROM string_collection WHERE string LIKE 'O%';
+```
+
+answer:
+```sql
+select * from cd.facilities
+WHERE name LIKE '%Tennis%';
+```
+
+or
+
+```sql
+select * from cd.facilities
+WHERE name ILIKE '%tennis%';
+```
+
+Question 6:
+```sql
+SELECT * from cd.facilities
+WHERE facid IN (1, 5);
+```
+
+Question 7:
+
+so `joindate` is a timestamp:
+![column_type_exercises2_timestamp](images/column_type_exercises2_timestamp.png)
+
+```sql
+SELECT memid, surname, firstname, joindate 
+FROM cd.members
+WHERE joindate >= '2012-09-01';
+```
+
+Question 8:
+
+```sql
+select DISTINCT(surname) from cd.members 
+order by surname 
+limit 10;
+```
+
+Question 9:
+```sql
+select TO_CHAR(joindate, 'YYYY:mm:dd hh24:MI:ss')
+from cd.members
+order by (joindate) DESC
+limit 1;
+```
+
+or
+
+```sql
+```sql
+select MAX(joindate)
+from cd.members;
+```
+
+Question 10:
+```sql
+SELECT COUNT(*) from cd.facilities
+WHERE guestcost > 10;
+```
+
+Question 11:
+```sql
+SELECT facid, SUM(slots) as total_slots
+FROM cd.bookings
+WHERE starttime >= '2012-09-01' AND starttime <= '2012-10-01'
+GROUP BY facid
+ORDER BY SUM(slots);
+```
+ notice you have to order by `SUM(SLOTS)` and not `total_slots` because the aliases are done last.
+
+Question 12:
+```sql
+SELECT cb.facid, SUM(slots) as total_slots
+FROM cd.bookings as cb
+INNER JOIN cd.facilities as cf
+ON cb.facid = cf.facid
+GROUP BY cb.facid
+HAVING SUM(slots) > 1000
+ORDER BY facid ASC;
+```
+
+Question 13:
+```sql
+SELECT cb.starttime AS start, cf.name as name
+FROM cd.bookings as cb
+INNER JOIN cd.facilities as cf
+ON cb.facid = cf.facid
+WHERE TO_CHAR(cb.starttime, 'YYYY-MM-DD') = '2012-09-21'
+AND name IN ('Tennis Court 1', 'Tennis Court 2')
+ORDER BY cb.starttime ASC, name;
+```
+
+
+Question 14:
