@@ -935,3 +935,34 @@ ORDER BY cb.starttime ASC, name;
 
 
 Question 14:
+
+
+## Section 8
+- a primary key is a column or group of columns used to identify a row uniquely in a table. Can be used for joining tables together.
+- A foreign key is a field or group of fields that uniquely identifies a row in another table
+- It references to the primary key of the other table.
+
+- The table that contains the foreign key is the referencing table or child table.
+- The table to which the foreign key references is called referenced table or parent table.
+
+#### Contraints
+- rules enforced on data columns in a table
+- They are used to prevent invalid data from being entered in a database
+- this ensures accuracy
+
+two main categories:  
+Column Constraints and Table Contraints
+
+Common COLUMN ones:
+- NOT NULL constraint. Ensure column cannot have NULL value.
+- UNIQUE constraint - ensures that all values in a column are different.
+- Primary key and Foreign key
+- CHECK constraint - ensures that all values in a column satisfy certain conditions
+- EXCLUSION - if any 2 rows are compared on the specified column or expression using the specified operator, not all of the comparisons will return TRUE.
+
+
+Table constraints:
+- CHECK
+- REFERENCES - to constrain the value stored in the column that must exist in a column in another table.
+- UNIQUE(column_list) - you can pass in multiople columns so values have to be unique across multiple columns
+- Primary key (column_list) - usually just 1 primary key but you can have multiple primary key columns
