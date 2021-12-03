@@ -966,3 +966,72 @@ Table constraints:
 - REFERENCES - to constrain the value stored in the column that must exist in a column in another table.
 - UNIQUE(column_list) - you can pass in multiople columns so values have to be unique across multiple columns
 - Primary key (column_list) - usually just 1 primary key but you can have multiple primary key columns
+
+
+# Section 8: creating databases
+
+## Create Table
+In datagrip, you can connect to the dvdrental database that you created using:
+```bash
+psql -h localhost -p 5432 -U jwan -d dvdrental
+```
+
+we already created a database and user with:
+```sql
+createdb dvdrental
+createuser jwan
+```
+
+- serial is used for the primary key. makes sure the primary key is unique so the user doens't have to provide a value for the primary key column.
+![serial.png](images/serial.png)
+
+![serial_types.png](images/serial_types.png)
+
+example syntax:
+![create_table_example.png](images/create_table_example.png)
+
+
+
+Here's the joined table:
+
+![create_table_account_job.png](images/create_table_account_job.png)
+- Notice the foreign key is of integer type in the `account_job` table and you need to use `references` for the other table.
+
+
+## Inserts
+
+
+![insert_error.png](images/insert_error.png)
+the above happens when you try to insert into a column that has a REFERENCES constraint when using an integer value that isn't a primary key in the specified table.
+
+The ddl for the account_job table:
+```sql
+create table account_job
+(
+    user_id   integer
+        constraint account_job_user_id_fkey
+            references account,
+```
+So since 4 is not a `user_id`, you cannot insert 4 into the account_job table in the `user_id` column
+
+
+
+this fails because the last insert value is larger than the varchar length:
+![insert_fail_varchar_length.png](images/insert_fail_varchar_length.png)
+
+
+
+
+
+## Update
+
+You can use the Update + Set syntax to update rows in a table. 
+
+general syntax:
+![update_syntax.png](images/update_syntax.png)
+
+This returns you the rows that were updated:
+![update_returning.png](images/update_returning.png)
+
+update based on the value of another table:
+![update_another_table.png](images/update_another_table.png)
