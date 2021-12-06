@@ -1020,7 +1020,11 @@ this fails because the last insert value is larger than the varchar length:
 ![insert_fail_varchar_length.png](images/insert_fail_varchar_length.png)
 
 
+## DELETE
 
+- we can delete rows in a table based on conditions of another, like a match of an id between 2 tables.
+
+![delete_another_table.png](images/delete_another_table.png)
 
 
 ## Update
