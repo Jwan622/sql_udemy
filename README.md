@@ -1097,3 +1097,31 @@ you can set a constriant with:
 ALTER TABLE new_info
 ALTER COLUMN people SET NOT NULL
 ```
+
+## DROP
+
+can drop a column, removes indexes and constraints for the column too
+
+but does not remove views, triggers, or stored procedures. YOu need to add in cascade clause to remove the dependencies too
+
+syntax:
+
+```sql
+ALTER TABLE <table name>
+DROP COLUMN <column name> < optional CASCADE>
+```
+
+check for existence to avoid error:
+
+```sql
+ALTER TABLE <table name>
+DROP COLUMN IF EXISTS <column name> < optional CASCADE>
+```
+
+multiple columns:
+
+```sql
+ALTER TABLE <table name>
+DROP COLUMN <column name 1>
+DROP COLUMN <column name 2>
+```
