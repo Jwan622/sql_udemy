@@ -1039,3 +1039,61 @@ This returns you the rows that were updated:
 
 update based on the value of another table:
 ![update_another_table.png](images/update_another_table.png)
+
+
+## Alter Table
+
+Some alter table examples:
+
+Say we have a table like this:
+
+```sql
+CREATE TABLE information(
+    info_id SERIAL PRIMARY KEY,
+    title VARCHAR(500) NOT NULL,
+    person VARCHAR(50) NOT NULL UNIQUE
+)
+```
+
+you can rename tables:
+
+```sql
+ALTER TABLE information
+RENAME TO new_info
+
+select * from new_info
+```
+
+You can rename columns:
+
+```sql
+ALTER TABLE new_info
+RENAME COLUMN person to people
+```
+
+you can alter constraints:
+Say you tried to do this:
+```sql
+INSERT INTO new_info(title)
+VALUES
+('some new title')
+```
+
+you'd get this error:
+
+```sql
+[23502] ERROR: null value in column "people" of relation "new_info" violates not-null constraint Detail: Failing row contains (1, some new title, null).
+```
+
+so you can alter the constraint
+```sql
+ALTER TABLE new_info
+ALTER COLUMN people DROP NOT NULL
+```
+
+you can set a constriant with:
+
+```sql
+ALTER TABLE new_info
+ALTER COLUMN people SET NOT NULL
+```
