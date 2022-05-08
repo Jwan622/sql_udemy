@@ -1104,7 +1104,7 @@ can drop a column, removes indexes and constraints for the column too
 
 but does not remove views, triggers, or stored procedures. YOu need to add in cascade clause to remove the dependencies too
 
-syntax:
+Basic syntax:
 
 ```sql
 ALTER TABLE <table name>
@@ -1115,13 +1115,199 @@ check for existence to avoid error:
 
 ```sql
 ALTER TABLE <table name>
-DROP COLUMN IF EXISTS <column name> < optional CASCADE>
+DROP COLUMN IF EXISTS <column name> <optional CASCADE>
 ```
+Cascade will remove additional dependencies on views and triggers if there are any.
 
-multiple columns:
-
+To drop multiple columns:
 ```sql
 ALTER TABLE <table name>
 DROP COLUMN <column name 1>
 DROP COLUMN <column name 2>
 ```
+
+## Check Constraint
+
+- more customized constraints that adhere to more specific constraints like number > 21 for age.
+- you can also add constraints to compare with other columns.
+
+```sql
+CREATE TABLE Persons (
+    ID int NOT NULL,
+    LastName varchar(255) NOT NULL,
+    FirstName varchar(255),
+    Age int,
+    CHECK (Age>=18)
+);
+```
+
+# Assessment Three
+
+```text
+Assessment Test 3
+Welcome to your final assessment test! This will test your knowledge of the previous section, focused on creating databases and table operations. This test will actually consist of a more open-ended assignment below:
+
+Complete the following task:
+
+Create a new database called "School" this database should have two tables: teachers and students.
+
+The students table should have columns for student_id, first_name,last_name, homeroom_number, phone,email, and graduation year.
+
+The teachers table should have columns for teacher_id, first_name, last_name,
+
+homeroom_number, department, email, and phone.
+
+The constraints are mostly up to you, but your table constraints do have to consider the following:
+
+ We must have a phone number to contact students in case of an emergency.
+
+ We must have ids as the primary key of the tables
+
+Phone numbers and emails must be unique to the individual.
+
+Once you've made the tables, insert a student named Mark Watney (student_id=1) who has a phone number of 777-555-1234 and doesn't have an email. He graduates in 2035 and has 5 as a homeroom number.
+
+Then insert a teacher names Jonas Salk (teacher_id = 1) who as a homeroom number of 5 and is from the Biology department. His contact info is: jsalk@school.org and a phone number of 777-555-4321.
+
+Keep in mind that these insert tasks may affect your constraints!
+```
+
+answer:
+
+```sql
+CREATE TABLE students(
+student_id serial PRIMARY KEY,
+first_name VARCHAR(45) NOT NULL,
+last_name VARCHAR(45) NOT NULL, 
+homeroom_number integer,
+phone VARCHAR(20) UNIQUE NOT NULL,
+email VARCHAR(115) UNIQUE,
+grad_year integer);
+```
+
+To create the teachers table:
+```sql
+CREATE TABLE teachers(
+teacher_id serial PRIMARY KEY,
+first_name VARCHAR(45) NOT NULL,
+last_name VARCHAR(45) NOT NULL, 
+homeroom_number integer,
+department VARCHAR(45),
+email VARCHAR(20) UNIQUE,
+phone VARCHAR(20) UNIQUE);
+```
+
+for inserting a student:
+```sql
+INSERT INTO students(first_name,last_name, homeroom_number,phone,grad_year)VALUES ('Mark','Watney',5,'7755551234',2035);
+```
+
+
+Then for inserting the teacher information:
+
+```sql
+INSERT INTO teachers(first_name,last_name, homeroom_number,department,email,phone)VALUES ('Jonas','Salk',5,'Biology','jsalk@school.org','7755554321');
+```
+
+
+# Conditional Expressions and Procedures
+
+- let's look at case and coalesce, cast, nullif, and Views
+
+## Case
+
+execute sql code when certain conditions are met. Like If/Else.
+
+General case vs Case Expression
+
+General case syntax first:
+```sql
+CASE
+
+WHEN condition1 THEN result1
+WHEN condition2 THEN result2
+
+ELSE some_other_result
+
+END
+```
+
+simple example that will return 2 columns, again this is the general case statement:
+
+```sql
+SELECT a,
+CASE 
+    WHEN a = 1 THEN 'one'
+    WHEN a = 2 THEN 'two'
+ELSE 'other'
+END 
+FROM test;
+```
+the above will return a second column by default named `case` which conditionally evalutes column `a`. You use the case statement in lieu of a column.
+
+Case expression syntax:
+- first evaluates an expression than compares result with each value in the WHEN clause sequentially.
+
+
+in front of CASE we evaluate an `expression`, like this:
+
+```sql
+CASE expression
+when value1 THEN result1
+when value2 THEN result2
+ELSE some_other_result
+end
+```
+and the WHEN's evaluate the values from `expression`.
+
+## Case examples, both ways, generic and case expression
+
+```sql
+Select customer_id,
+CASE
+    WHEN (customer_id <= 100) THEN 'Premium'
+    WHEN (customer_id BETWEEN 100 and 200) THEN 'Plus'
+    ELSE 'Normal'
+END AS customer_class
+FROM customer
+```
+
+The following is an example of case expression. It implicitly checks equality:
+
+```sql
+Select customer_id,
+CASE customer_id
+    WHEN 2 THEN 'Winner'
+    WHEN 5 THEN 'Loser'
+    ELSE 'Did not play raffle'
+END AS customer_raffle_results
+FROM customer
+```
+
+perform operations on results of case statements:
+
+```sql
+SELECT
+CASE rental_rate
+    WHEN 0.99 THEN 1
+    ELSE 0
+END
+from film
+```
+
+What's nice about this is you can add up the case column since you've used 1s and 0s.
+
+```sql
+SELECT
+SUM(CASE rental_rate
+    WHEN 0.99 THEN 1
+    ELSE 0
+END) as number_of_bargains,
+SUM(CASE rental_rate
+    WHEN 4.99 THEN 1
+    ELSE 0
+END) as premiums
+from film
+```
+
+We're calling functions (`SUM`) on results of a case column.
