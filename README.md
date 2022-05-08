@@ -1311,3 +1311,20 @@ from film
 ```
 
 We're calling functions (`SUM`) on results of a case column.
+
+## COALESCE
+
+- accepts and unlimited number of arguments, returns first argument that is not NULL. If all args evaluate to NULL, then it returns NULL
+
+`SELECT COALESCE(null, 2,3)` returns 2
+
+when you query a table that contains NULLs, and you're trying to do an operation on the returned values, you can use `COALESCE`.
+
+IN sql, price - discount would = NULL if discount was null. Oddd I know. So you can do: `price - COALESCE(discount,0)` instead.
+
+**Keep COALESCE in mind in case you encounter a table with null values that you wnat to perform operations on**
+- especially true if you don't want to change the table itself. sometimes the null values are desired values in the talble
+
+
+## CAST
+
