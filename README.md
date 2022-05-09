@@ -1328,3 +1328,40 @@ IN sql, price - discount would = NULL if discount was null. Oddd I know. So you 
 
 ## CAST
 
+- allows you to convert from one data type to another
+- it must be reasonable to convert the data like the string '5' to the integer 5 will work.
+
+Cast function and operator, these are synonymous:
+
+```sql
+SELECT CAST('5' as INTEGER)
+SELECT '5'::INTEGER
+```
+
+you can also use a column name in cast.
+
+```sql
+SELECT CAST(inventory_id AS VARCHAR) from rental
+```
+
+
+## NULLIF
+
+- takes in 2 inputs and returns NULL if both are equal, or it returns the first argument passed.
+```sql
+NULLIF(10,10)
+```
+will return NULL.
+
+useful when a null value would cause an error or an unwanted result
+
+or to gaurd against division by 0 errors by transforming it into a null in the denominator:
+
+```sql
+SELECT (
+    SUM(CASE WHEN department = 'A' THEN 1 ELSE 0 end)/
+    NULLIF(SUM(CASE WHEN department = 'A' THEN 1 ELSE 0 end), 0)
+) as department_ratio
+FROM depts
+```
+that will return `null` instead of division by 0 errors.
